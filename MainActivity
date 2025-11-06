@@ -1,0 +1,65 @@
+package com.example.eleven
+import android.graphics.Color
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var adapter: RectangleAdapter
+    private val rectangleList = mutableListOf<RectangleItem>() 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main) 
+
+        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        val addButton: FloatingActionButton = findViewById(R.id.addButton)
+        adapter = RectangleAdapter(rectangleList)
+
+        val numberOfColumns = calculateNumberOfColumns()
+        recyclerView.layoutManager = GridLayoutManager(this, numberOfColumns)
+        recyclerView.adapter = adapter
+
+        if (savedInstanceState == null) {
+            addInitialItems()
+        }
+
+        addButton.setOnClickListener {
+            addNewRectangle()
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        val numberOfColumns = calculateNumberOfColumns()
+        (recyclerView.layoutManager as GridLayoutManager).spanCount = numberOfColumns
+    }
+
+    private fun calculateNumberOfColumns(): Int {
+        val displayMetrics = resources.displayMetrics
+        val dpWidth = displayMetrics.widthPixels / displayMetrics.density
+        return if (dpWidth > 600) 4 else 3
+    }
+
+    private fun addInitialItems() {
+        repeat(10) { 
+            addNewRectangle()
+        }
+    }
+
+
+    private fun addNewRectangle() {
+        val nextNumber = rectangleList.size 
+        val color = if (nextNumber % 2 == 0) {
+            resources.getColor(R.color.red_500, null) 
+        } else {
+            resources.getColor(R.color.blue_500, null) 
+        }
+        val newItem = RectangleItem(nextNumber, color)
+        adapter.addItem(newItem)
+    }
+}
